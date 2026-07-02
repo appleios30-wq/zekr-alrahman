@@ -39,16 +39,6 @@
     "plugins": [
       "expo-secure-store",
       "expo-local-authentication"
-    ],
-    "fonts": {
-      "Cairo-Bold": "./assets/fonts/Cairo-Bold.ttf",
-      "Cairo-Regular": "./assets/fonts/Cairo-Regular.ttf",
-      "Amiri-Regular": "./assets/fonts/Amiri-Regular.ttf",
-      "Amiri-Bold": "./assets/fonts/Amiri-Bold.ttf",
-      "ArefRuqaa": "./assets/fonts/ArefRuqaa-Regular.ttf",
-      "ReemKufi": "./assets/fonts/ReemKufi-Regular.ttf",
-      "Almarai-Regular": "./assets/fonts/Almarai-Regular.ttf",
-      "Tajawal-Regular": "./assets/fonts/Tajawal-Regular.ttf"
-    }
+    ]
   }
 }
