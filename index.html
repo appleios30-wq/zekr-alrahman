@@ -4,7 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zekr Alrahman — ذكر الرحمن</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Amiri:wght@400;700&family=Aref+Ruqaa&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#050505">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="ذكر الرحمن">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Amiri:wght@400;700&family=ArefRuqaa&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Cairo',sans-serif;height:100vh;overflow:hidden;color:#fff}
@@ -657,6 +664,14 @@ setInterval(applyTheme,60000);
 // Restore active reminders
 var savedReminders=getReminders();
 Object.keys(savedReminders).forEach(function(k){if(savedReminders[k])setupReminderAlarm(k)});
+// Register Service Worker for PWA offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').then(function(reg){
+    console.log('SW registered');
+  }).catch(function(err){
+    console.log('SW failed:',err);
+  });
+}
 </script>
 </body>
 </html>
