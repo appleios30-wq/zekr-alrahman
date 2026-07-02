@@ -1,37 +1,341 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>Zekr Alrahman</title>
-    <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
-    <style id="expo-reset">
-      /* These styles make the body full-height */
-      html,
-      body {
-        height: 100%;
-      }
-      /* These styles disable body scrolling if you are using <ScrollView> */
-      body {
-        overflow: hidden;
-      }
-      /* These styles make the root element full-height */
-      #root {
-        display: flex;
-        height: 100%;
-        flex: 1;
-      }
-    </style>
-  <link rel="icon" href="favicon.ico" /></head>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zekr Alrahman — ذكر الرحمن</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Amiri:wght@400;700&family=Aref+Ruqaa&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Cairo',sans-serif;height:100vh;overflow:hidden;color:#fff}
+:root{
+--bg:#050505;--neon1:#00D4FF;--neon2:#00FF88;--neon3:#B24BF3;--neon4:#FF0040;--neon5:#FFD700;
+--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);
+}
+/* Theme classes */
+.theme-morning{--bg:#0A0E1A;--neon1:#00D4FF;--neon2:#00FF88}
+.theme-evening{--bg:#0D0221;--neon1:#B24BF3;--neon2:#FF6B35}
+.theme-sleep{--bg:#050505;--neon1:#FF0040;--neon2:#FFD700}
 
-  <body>
-    <!-- Use static rendering with Expo Router to support running without JavaScript. -->
-    <noscript>
-      You need to enable JavaScript to run this app.
-    </noscript>
-    <!-- The root element for your Expo app. -->
-    <div id="root"></div>
-  <script src="_expo/static/js/web/AppEntry-9d0ce220ca936ffe8ba99b381b47b999.js" defer></script>
+#app{height:100vh;display:flex;flex-direction:column;background:var(--bg);position:relative;overflow:hidden}
+#app::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+background:radial-gradient(ellipse at 20% 15%,rgba(0,212,255,0.08),transparent 60%),
+radial-gradient(ellipse at 80% 30%,rgba(0,255,136,0.06),transparent 60%),
+radial-gradient(ellipse at 50% 80%,rgba(178,75,243,0.05),transparent 60%);pointer-events:none}
+
+.header{text-align:center;padding:50px 20px 15px;flex-shrink:0;z-index:10}
+.header h1{font-family:'Aref Ruqaa',serif;font-size:28px;color:var(--neon1);
+text-shadow:0 0 10px var(--neon1),0 0 20px var(--neon1),0 0 40px var(--neon1)}
+.header p{font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px}
+
+.content{flex:1;overflow-y:auto;padding:10px 16px 90px;z-index:10}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-thumb{background:var(--neon1);border-radius:4px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;
+padding:16px;margin-bottom:10px;backdrop-filter:blur(10px);transition:all 0.2s;cursor:pointer}
+.card:hover{border-color:var(--neon1);box-shadow:0 0 15px rgba(0,212,255,0.15)}
+.card h3{font-family:'Cairo',sans-serif;font-weight:700;font-size:16px;color:var(--neon1);margin-bottom:6px}
+.card p{font-family:'Amiri',serif;font-size:14px;color:rgba(255,255,255,0.7);line-height:1.8}
+.card .count{display:flex;align-items:center;gap:10px;margin-top:10px}
+.card .bar{flex:1;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden}
+.card .bar-fill{height:100%;background:var(--neon2);border-radius:2px;transition:width 0.3s}
+.card .num{font-size:13px;color:var(--neon2);font-weight:700;min-width:60px;text-align:left}
+.card .ref{font-size:10px;color:rgba(255,255,255,0.3);margin-top:6px}
+
+/* Names grid */
+.names-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
+.name-card{background:var(--card);border:1px solid var(--border);border-radius:12px;
+padding:12px 6px;text-align:center;cursor:pointer;transition:all 0.2s}
+.name-card:hover{border-color:var(--neon1);box-shadow:0 0 10px rgba(0,212,255,0.2);transform:translateY(-2px)}
+.name-card .name{font-family:'Aref Ruqaa',serif;font-size:18px;color:var(--neon1);
+text-shadow:0 0 8px currentColor;margin-bottom:4px}
+.name-card .meaning{font-size:9px;color:rgba(255,255,255,0.4);line-height:1.3}
+
+/* Name detail */
+.detail-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);
+z-index:100;display:none;justify-content:center;align-items:flex-start;padding:60px 20px;overflow-y:auto}
+.detail-overlay.active{display:flex}
+.detail-box{background:var(--bg);border:1px solid var(--neon1);border-radius:20px;
+padding:30px;max-width:500px;width:100%;box-shadow:0 0 30px rgba(0,212,255,0.2)}
+.detail-box .big-name{font-family:'Aref Ruqaa',serif;font-size:48px;text-align:center;
+color:var(--neon1);text-shadow:0 0 20px currentColor;margin-bottom:10px}
+.detail-box .meaning{font-size:14px;color:rgba(255,255,255,0.7);text-align:center;margin-bottom:20px}
+.detail-box .desc{font-family:'Amiri',serif;font-size:15px;color:rgba(255,255,255,0.6);
+line-height:1.8;text-align:right;margin-bottom:16px}
+.detail-box .zikr{font-family:'Amiri',serif;font-size:17px;color:var(--neon2);
+text-align:center;line-height:1.8;padding:12px;background:rgba(0,255,136,0.05);
+border-radius:12px;margin-bottom:16px}
+.detail-box .close{display:block;width:100%;padding:12px;background:transparent;
+border:1px solid var(--neon1);border-radius:12px;color:var(--neon1);font-family:'Cairo';
+font-size:14px;cursor:pointer;transition:all 0.2s}
+.detail-box .close:hover{background:rgba(0,212,255,0.1)}
+
+/* Tabs */
+.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;background:rgba(5,5,5,0.9);
+backdrop-filter:blur(20px);border-top:1px solid var(--border);z-index:50;padding:8px 0 12px}
+.tab{flex:1;text-align:center;cursor:pointer;padding:6px;transition:all 0.2s;border:none;
+background:none;color:rgba(255,255,255,0.3)}
+.tab.active{color:var(--neon1)}
+.tab .icon{font-size:20px;display:block;margin-bottom:2px}
+.tab .label{font-size:10px;font-family:'Cairo'}
+
+/* Counter */
+.counter-badge{display:inline-block;background:var(--neon2);color:#000;font-weight:700;
+font-size:11px;padding:2px 8px;border-radius:10px;margin-left:6px}
+
+.empty{text-align:center;color:rgba(255,255,255,0.3);padding:60px 20px;font-size:14px}
+.search{width:100%;padding:10px 16px;background:rgba(255,255,255,0.04);border:1px solid var(--border);
+border-radius:20px;color:#fff;font-family:'Cairo';font-size:13px;margin-bottom:12px;outline:none}
+.search:focus{border-color:var(--neon1)}
+.greeting{font-size:12px;color:var(--neon2);margin-bottom:4px}
+.filter-row{display:flex;gap:6px;margin-bottom:10px;justify-content:center}
+.filter-chip{padding:5px 14px;border-radius:20px;border:1px solid var(--border);
+background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.4);font-size:11px;cursor:pointer;transition:all 0.2s}
+.filter-chip.active{background:rgba(0,212,255,0.15);border-color:var(--neon1);color:var(--neon1)}
+</style>
+</head>
+<body>
+<div id="app" class="theme-sleep">
+  <div class="header">
+    <div class="greeting" id="greeting"></div>
+    <h1 id="appTitle">ذكر الرحمن</h1>
+    <p>ما بينك وبين الله</p>
+  </div>
+  <div class="content" id="content"></div>
+  <div class="tabs">
+    <button class="tab active" data-tab="adhkar" onclick="switchTab('adhkar')">
+      <span class="icon">✨</span><span class="label">أذكاري</span>
+    </button>
+    <button class="tab" data-tab="names" onclick="switchTab('names')">
+      <span class="icon">🌟</span><span class="label">أسماء الله</span>
+    </button>
+    <button class="tab" data-tab="sirr" onclick="switchTab('sirr')">
+      <span class="icon">🛡️</span><span class="label">سر في بئر</span>
+    </button>
+    <button class="tab" data-tab="settings" onclick="switchTab('settings')">
+      <span class="icon">⚙️</span><span class="label">إعدادات</span>
+    </button>
+  </div>
+</div>
+<div class="detail-overlay" id="detailOverlay" onclick="closeDetail(event)">
+  <div class="detail-box" id="detailBox"></div>
+</div>
+
+<script>
+// ============================================================================
+//  البيانات
+// ============================================================================
+var ADHKAR=[
+{t:"آية الكرسي",c:"اللّهُ لاَ إِلَـهَ إِلاَّ هُوَ الْحَيُّ الْقَيُّومُ لاَ تَأْخُذُهُ سِنَةٌ وَلاَ نَوْمٌ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الأَرْضِ مَن ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلاَّ بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلاَ يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلاَّ بِمَا شَاء وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالأَرْضَ وَلاَ يَؤُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ",cat:"morning",target:1,ref:"سورة البقرة: ٢٥٥"},
+{t:"المعوذتان",c:"قل هو الله أحد • قل أعوذ برب الفلق • قل أعوذ برب الناس",cat:"morning",target:3,ref:"سورة الإخلاص والمعوذتين"},
+{t:"أصبحنا وأصبح الملك لله",c:"أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَـهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ",cat:"morning",target:1,ref:"رواه مسلم"},
+{t:"اللهم بك أصبحنا",c:"اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ النُّشُورُ",cat:"morning",target:1,ref:"رواه الترمذي"},
+{t:"سبحان الله وبحمده",c:"سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",cat:"morning",target:100,ref:"رواه البخاري"},
+{t:"لا إله إلا الله وحده",c:"لاَ إِلَـهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",cat:"morning",target:10,ref:"رواه البخاري"},
+{t:"أستغفر الله",c:"أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ",cat:"morning",target:100,ref:"رواه البخاري"},
+{t:"اللهم صل على محمد",c:"اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ",cat:"morning",target:100,ref:"رواه الترمذي"},
+{t:"بسم الله الذي لا يضر",c:"بِسْمِ اللَّهِ الَّذِي لاَ يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الأَرْضِ وَلاَ فِي السَّمَاءِ، وَهُوَ السَّمِيعُ الْعَلِيمُ",cat:"morning",target:3,ref:"رواه الترمذي"},
+{t:"يا حي يا قيوم",c:"يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ، أَصْلِحْ لِي شَأْنِي كُلَّهُ، وَلاَ تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ",cat:"morning",target:1,ref:"رواه الحاكم"},
+{t:"أمسينا وأمسى الملك لله",c:"أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَـهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ",cat:"evening",target:1,ref:"رواه مسلم"},
+{t:"اللهم بك أمسينا",c:"اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ الْمَصِيرُ",cat:"evening",target:1,ref:"رواه الترمذي"},
+{t:"اللهم إنك عفو كريم",c:"اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنَّا",cat:"evening",target:3,ref:"رواه الترمذي"},
+{t:"أذكار النوم",c:"بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",cat:"general",target:1,ref:"رواه البخاري"},
+{t:"التسبيح قبل النوم",c:"سُبْحَانَ اللَّهِ (٣٣) • الْحَمْدُ لِلَّهِ (٣٣) • اللَّهُ أَكْبَرُ (٣٤)",cat:"general",target:100,ref:"رواه البخاري"},
+{t:"لا حول ولا قوة إلا بالله",c:"لاَ حَوْلَ وَلاَ قُوَّةَ إِلاَّ بِاللَّهِ",cat:"general",target:100,ref:"رواه البخاري"},
+{t:"أستغفر الله العظيم",c:"أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ الَّذِي لاَ إِلَـهَ إِلاَّ هُوَ الْحَيُّ الْقَيُّومُ وَأَتُوبُ إِلَيْهِ",cat:"general",target:100,ref:"رواه الترمذي"},
+{t:"الحمد لله",c:"الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",cat:"general",target:100,ref:"قرآن كريم"},
+];
+
+var NAMES=[
+{n:"الرحمن",m:"ذو الرحمة الواسعة",d:"اسم يدل على شمول رحمة الله لجميع خلقه مؤمنهم وكافرهم",z:"يا رحمن، ارحمنا برحمتك التي وسعت كل شيء",c:"#00D4FF"},
+{n:"الرحيم",m:"ذو الرحمة الخاصة بالمؤمنين",d:"رحمة الله الخاصة بعباده المؤمنين في الدنيا والآخرة",z:"يا رحيم، ارحمنا في الدارين",c:"#00FF88"},
+{n:"الملك",m:"المتصرف في الملك بمشيئته",d:"المالك المطلق للعالمين، المتصرف في الكون كما يشاء",z:"يا ملك الملوك، أكرمنا بكرمك",c:"#FFD700"},
+{n:"القدوس",m:"الطاهر المنزه عن كل النقص",d:"المنزه عن كل عيب ونقص وشريك وولد",z:"سبحان القدوس، سبحانك ربي القدوس",c:"#B24BF3"},
+{n:"السلام",m:"السلامة من كل نقص",d:"الذي سلم من كل عيب ونقص، والذي يسلم خلقه من الظلم",z:"اللهم أنت السلام ومنك السلام",c:"#00FF88"},
+{n:"المؤمن",m:"المصدق لرسله وآياته",d:"الذي يصدق رسله وآياته، ويعطي الأمان لخلقه",z:"يا مؤمن، أمننا من كل خوف",c:"#00D4FF"},
+{n:"المهيمن",m:"الرقيب الحافظ الشاهد",d:"الشاهد على كل شيء، الحافظ لكل شيء، القائم على الكون",z:"يا مهيمن، احفظنا بحفظك",c:"#FF6B35"},
+{n:"العزيز",m:"الغالب الذي لا يُقهر",d:"القوي المنيع الذي لا يُغلب، صاحب العزة والكبرياء",z:"يا عزيز، أعز الإسلام والمسلمين",c:"#FF0040"},
+{n:"الجبار",m:"المتكبر بعظمته",d:"الذي يجبر الكسر ويصلح الأحوال، المتعالي بقدرته",z:"يا جبار، اجبر بخاطرنا واكشف كربتنا",c:"#B24BF3"},
+{n:"المتكبر",m:"المتعالي عن كل نقص",d:"الذي تعالى عن صفات المخلوقين، المتعالي بذاته وصفاته",z:"سبحان المتكبر، العظيم الجليل",c:"#FFD700"},
+{n:"الخالق",m:"المبدع من العدم",d:"الذي خلق كل شيء من العدم بقدرته وإرادته",z:"سبحان الخالق العظيم",c:"#00FF88"},
+{n:"البارئ",m:"الذي خلق الخلق بقدرته",d:"الذي برأ الخلق وأوجدهم بلا مثال سابق",z:"سبحان البارئ المصور",c:"#00D4FF"},
+{n:"المصور",m:"الذي أعطى كل خلق صورة",d:"الذي صور الخلق في الأرحام وأعطاهم صورهم المميزة",z:"سبحان المصور، الخالق البديع",c:"#B24BF3"},
+{n:"الغفار",m:"الذي يغفر الذنوب ويستر العيوب",d:"صيغة مبالغة في الغفران، يغفر الذنوب كافة",z:"استغفر الله العظيم الحي القيوم",c:"#00FF88"},
+{n:"القهار",m:"الذي يقهر الجبابرة والطغاة",d:"الذي يقهر كل شيء ويخضع له كل شيء",z:"يا قهار، اقهر أعداءك وأعداء دينك",c:"#FF0040"},
+{n:"الوهاب",m:"المعطي بلا مقابل",d:"الذي يعطي بلا حد ولا عدد ولا مقابل",z:"اللهم إنك عفو كريم تحب العفو فاعف عنا",c:"#FFD700"},
+{n:"الرزاق",m:"المتكفل بأرزاق الخلق",d:"الذي يرزق جميع خلقه ويقدر أرزاقهم",z:"اللهم ارزقنا رزقاً حلالاً طيباً",c:"#00D4FF"},
+{n:"الفتاح",m:"الذي يفتح أبواب الرحمة والرزق",d:"فاتح أبواب الرحمة والرزق والعلم، الحكم بين عباده",z:"يا فتاح، افتح لنا فتوح العارفين",c:"#00FF88"},
+{n:"العليم",m:"الذي يعلم كل شيء",d:"الذي أحاط علمه بكل شيء، ظاهراً وباطناً",z:"سبحان العليم بكل شيء",c:"#B24BF3"},
+{n:"السميع",m:"الذي يسمع كل شيء",d:"الذي أحاط سمعه بكل الأصوات والأصوات",z:"اللهم إنك سميع قريب مجيب",c:"#00FF88"},
+{n:"البصير",m:"الذي يبصر كل شيء",d:"الذي أحاط بصره بكل الأشياء، ظاهراً وباطناً",z:"سبحان البصير بكل شيء",c:"#00D4FF"},
+{n:"الحكم",m:"الحاكم العدل",d:"الحاكم العدل الذي يحكم بين عباده بالحق",z:"اللهم احكم بيننا بالحق",c:"#B24BF3"},
+{n:"العدل",m:"الذي يجازي بالعدل",d:"الذي لا يجور في حكمه، العدل المطلق",z:"يا عدل، انصر الحق والعدل",c:"#00FF88"},
+{n:"اللطيف",m:"الذي يعلم خفايا الأمور",d:"الذي يعلم خفايا الأمور ويرسل لطفه السري",z:"اللهم إنك لطيف بمن تلطف به",c:"#FFD700"},
+{n:"الخبير",m:"الذي يعلم تفاصيل الأمور",d:"الذي اطلع على سرائر الأشياء وبواطنها",z:"يا خبير، اطلع على حالنا وحولنا",c:"#00D4FF"},
+{n:"الحليم",m:"الذي لا يعاجل بالعقوبة",d:"الذي يمهل العباد ولا يعاجلهم بالعقوبة",z:"يا حليم، احلم عنا ولا تعاجلنا",c:"#00FF88"},
+{n:"العظيم",m:"الذي وصفه العظمة",d:"الذي وصفه العظمة في ذاته وصفاته وأفعاله",z:"سبحان العظيم رب العرش العظيم",c:"#B24BF3"},
+{n:"الغفور",m:"الذي يغفر الذنوب",d:"صيغة مبالغة في المغفرة، يغفر الذنوب ويستر العيوب",z:"استغفر الله الغفور الرحيم",c:"#00FF88"},
+{n:"الشكور",m:"الذي يشكر القليل",d:"الذي يشكر عباده على القليل ويعطيهم الكثير",z:"اللهم اجعلنا من الشاكرين",c:"#FFD700"},
+{n:"العلي",m:"الذي علا بذاته وقدره",d:"الذي علا بذاته وقدره وقهره، المتعالي عن كل شيء",z:"سبحان العلي الأعلى",c:"#00D4FF"},
+{n:"الكبير",m:"الذي وصفه الكبرياء",d:"الذي وصفه الكبرياء والعظمة والجلال",z:"سبحان الكبير المتعال",c:"#B24BF3"},
+{n:"الحفيظ",m:"الحافظ لكل شيء",d:"الذي يحفظ السماوات والأرض وما فيهما",z:"يا حفيظ، احفظنا من كل شر",c:"#00FF88"},
+{n:"الكريم",m:"الذي أكرم من كل كريم",d:"الذي أكرم من كل كريم، يعطي بلا عد ولا حد",z:"يا كريم، أكرمنا بكرمك",c:"#FFD700"},
+{n:"المجيب",m:"الذي يجيب دعاء الداعين",d:"الذي يجيب دعاء من يدعوه ويستجيب له",z:"اللهم إنك مجيب الدعاء",c:"#00FF88"},
+{n:"الواسع",m:"الذي وسع رزقه ورحمته",d:"الذي وسع رزقه ورحمته لجميع الخلق",z:"يا واسع، وسع علينا رزقك ورحمتك",c:"#00D4FF"},
+{n:"الحكيم",m:"الذي وصفه الحكمة",d:"الذي وصفه الحكمة في أفعاله وأقواله",z:"اللهم إنك حكيم فاحكم بيننا بالحق",c:"#B24BF3"},
+{n:"الودود",m:"الذي يحب عباده",d:"الذي يحب عباده الصالحين ويحبونه",z:"يا ودود، أدم علينا حبك",c:"#FF0040"},
+{n:"الباعث",m:"الذي يبعث الموتى",d:"الذي يبعث الموتى من قبورهم للحساب",z:"يا باعث، أحينا على الإيمان",c:"#00FF88"},
+{n:"الشهيد",m:"الحاضر الذي لا يغيب",d:"الشاهد على كل شيء، الحاضر الذي لا يغيب",z:"اللهم إنك شهيد على كل شيء",c:"#00D4FF"},
+{n:"الحق",m:"الذي وصفه الحق المطلق",d:"الذي وصفه الحق في ذاته وأقواله وأفعاله",z:"اللهم اهدنا إلى الحق",c:"#00FF88"},
+{n:"الوكيل",m:"الذي يكفي عباده",d:"الذي يكفي عباده بكفايته وتدبيره",z:"حسبي الله ونعم الوكيل",c:"#FFD700"},
+{n:"القوي",m:"الذي وصفه القوة المطلقة",d:"الذي وصفه القوة المطلقة التي لا تُقهر",z:"يا قوي، قوّينا على طاعتك",c:"#FF0040"},
+{n:"الولي",m:"الذي يتولى عباده المؤمنين",d:"الذي يتولى عباده المؤمنين وينصرهم ويرعاهم",z:"اللهم اجعلنا من أوليائك",c:"#00D4FF"},
+{n:"الحميد",m:"الذي وصفه الحمد المطلق",d:"الذي وصفه الحمد المطلق في ذاته وصفاته",z:"الحمد لله رب العالمين",c:"#00FF88"},
+{n:"المحيي",m:"الذي يحيي الموتى",d:"الذي يحيي الموتى ويحيي القلوب بالإيمان",z:"يا محيي، أحي قلوبنا بنور الإيمان",c:"#00FF88"},
+{n:"الحي",m:"الذي وصفه الحياة الأبدية",d:"الذي وصفه الحياة الأبدية التي لا تموت",z:"يا حي يا قيوم برحمتك أستغيث",c:"#00D4FF"},
+{n:"القيوم",m:"القائم على كل شيء",d:"القائم على كل شيء بذاته، الذي لا يحتاج إلى أحد",z:"يا قيوم، قم بأمرنا وأصلح شأننا",c:"#00FF88"},
+{n:"النور",m:"الذي وصفه النور المطلق",d:"الذي وصفه النور المطلق في ذاته وعلمه وهداه",z:"اللهم اجعلنا نوراً يهدي به",c:"#FFD700"},
+{n:"الهادي",m:"الذي يهدي من يشاء",d:"الذي يهدي من يشاء إلى الصراط المستقيم",z:"اللهم اهدنا الصراط المستقيم",c:"#00D4FF"},
+{n:"البديع",m:"الذي وصفه البداعة",d:"الذي وصفه البداعة والإبداع في خلقه",z:"سبحان البديع في خلقه",c:"#B24BF3"},
+{n:"الباقي",m:"الذي وصفه البقاء الأبدي",d:"الذي وصفه البقاء الأبدي الذي لا يفنى",z:"سبحان الباقي الذي لا يفنى",c:"#00FF88"},
+{n:"الوارث",m:"الذي يرث كل شيء",d:"الذي يرث الأرض ومن عليها، الباقي بعد فناء كل شيء",z:"اللهم اجعلنا من ورثة الجنة",c:"#FFD700"},
+{n:"الصبور",m:"الذي وصفه الصبر",d:"الذي وصفه الصبر والأناة على عقوبة الظالمين",z:"يا صبور، صبرنا على بلائك",c:"#00FF88"},
+{n:"التواب",m:"الذي يقبل التوبة",d:"الذي يقبل توبة التائبين ويغفر لهم",z:"تب الله على التائبين",c:"#00FF88"},
+{n:"العفو",m:"الذي يعفو عن الذنوب",d:"الذي يعفو عن الذنوب ويصفح عن العيوب",z:"اللهم إنك عفو تحب العفو فاعف عنا",c:"#00FF88"},
+{n:"الرؤوف",m:"الذي وصفه الرأفة",d:"الذي وصفه الرأفة الشديدة بعباده",z:"يا رؤوف، ارأف بنا وارحم ضعفنا",c:"#00D4FF"},
+{n:"مالك الملك",m:"مالك كل شيء",d:"مالك كل شيء، المتصرف في الملك كله",z:"سبحان مالك الملك",c:"#FFD700"},
+{n:"ذو الجلال والإكرام",m:"الذي وصفه الجلال والكرم",d:"الذي وصفه الجلال والإكرام في ذاته",z:"تباركت يا ذا الجلال والإكرام",c:"#B24BF3"},
+{n:"الغني",m:"الذي وصفه الغنى المطلق",d:"الذي وصفه الغنى المطلق عن كل شيء",z:"اللهم اجعلنا غنيين بغناك",c:"#FFD700"},
+{n:"الصمد",m:"الذي يصمد إليه الخلق",d:"الذي يصمد إليه الخلق في حوائجهم",z:"اللهم إنك صمدنا في كل حين",c:"#00D4FF"},
+{n:"الواحد",m:"الذي وصفه التوحيد",d:"الذي وصفه التوحيد في ذاته وأفعاله",z:"قل هو الله أحد",c:"#00FF88"},
+];
+
+// ============================================================================
+//  State
+// ============================================================================
+var currentTab='adhkar';
+var counts={};
+var filterCat='all';
+
+function getTheme(){var h=new Date().getHours();if(h>=5&&h<17)return'morning';if(h>=17&&h<21)return'evening';return'sleep';}
+function getGreeting(){var h=new Date().getHours();if(h>=5&&h<12)return'صباح الخير ✨';if(h>=12&&h<17)return'مساء النور 🌟';if(h>=17&&h<21)return'مساء الطمأنينة 🌙';return'ليلة سعيدة 🌙';}
+
+function applyTheme(){
+var t=getTheme();
+var app=document.getElementById('app');
+app.className='theme-'+t;
+var titles={morning:'☀️ ذكر الصباح',evening:'🌆 ذكر المساء',sleep:'🌙 ذكر الليل'};
+document.getElementById('appTitle').textContent=titles[t];
+document.getElementById('greeting').textContent=getGreeting();
+}
+
+function switchTab(tab){
+currentTab=tab;
+document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+document.querySelector('[data-tab="'+tab+'"]').classList.add('active');
+render();
+}
+
+function render(){
+var c=document.getElementById('content');
+if(currentTab==='adhkar')renderAdhkar(c);
+else if(currentTab==='names')renderNames(c);
+else if(currentTab==='sirr')renderSirr(c);
+else if(currentTab==='settings')renderSettings(c);
+}
+
+function renderAdhkar(c){
+var cats=[{k:'all',l:'الكل'},{k:'morning',l:'صباح'},{k:'evening',l:'مساء'},{k:'general',l:'عام'}];
+var html='<div class="filter-row">';
+cats.forEach(function(cat){
+html+='<button class="filter-chip '+(filterCat===cat.k?'active':'')+'" onclick="setFilter(\''+cat.k+'\')">'+cat.l+'</button>';
+});
+html+='</div>';
+var list=ADHKAR.filter(function(a){return filterCat==='all'||a.cat===filterCat});
+if(list.length===0){html+='<div class="empty">لا توجد أذكار</div>';c.innerHTML=html;return;}
+list.forEach(function(a,i){
+var id='z'+i;
+var cur=counts[id]||0;
+var pct=Math.min(100,(cur/a.target)*100);
+html+='<div class="card" onclick="increment(\''+id+'\','+i+')">';
+html+='<h3>'+a.t+'</h3>';
+html+='<p>'+a.c+'</p>';
+html+='<div class="count"><div class="bar"><div class="bar-fill" style="width:'+pct+'%"></div></div>';
+html+='<span class="num">'+cur+' / '+a.target+'</span></div>';
+if(a.ref)html+='<div class="ref">'+a.ref+'</div>';
+html+='</div>';
+});
+c.innerHTML=html;
+}
+
+function setFilter(cat){filterCat=cat;render();}
+
+function increment(id,i){
+counts[id]=(counts[id]||0)+1;
+if(counts[id]>ADHKAR[i].target)counts[id]=ADHKAR[i].target;
+renderAdhkar(document.getElementById('content'));
+}
+
+function renderNames(c){
+var html='<input class="search" type="text" placeholder="ابحث في الأسماء..." oninput="searchNames(this.value)">';
+html+='<div class="names-grid" id="namesGrid">';
+NAMES.forEach(function(n,i){
+html+='<div class="name-card" onclick="showDetail('+i+')">';
+html+='<div class="name" style="color:'+n.c+';text-shadow:0 0 8px '+n.c+'">'+n.n+'</div>';
+html+='<div class="meaning">'+n.m+'</div></div>';
+});
+html+='</div>';
+c.innerHTML=html;
+}
+
+function searchNames(val){
+var grid=document.getElementById('namesGrid');
+if(!grid)return;
+var html='';
+NAMES.forEach(function(n,i){
+if(n.n.includes(val)||n.m.includes(val)){
+html+='<div class="name-card" onclick="showDetail('+i+')">';
+html+='<div class="name" style="color:'+n.c+';text-shadow:0 0 8px '+n.c+'">'+n.n+'</div>';
+html+='<div class="meaning">'+n.m+'</div></div>';
+}
+});
+grid.innerHTML=html||'<div class="empty">لا نتائج</div>';
+}
+
+function showDetail(i){
+var n=NAMES[i];
+var box=document.getElementById('detailBox');
+box.innerHTML='<div class="big-name" style="color:'+n.c+';text-shadow:0 0 20px '+n.c+'">'+n.n+'</div>'+
+'<div class="meaning">'+n.m+'</div>'+
+'<div class="desc">'+n.d+'</div>'+
+'<div class="zikr">'+n.z+'</div>'+
+'<button class="close" onclick="closeDetail()">رجوع</button>';
+document.getElementById('detailOverlay').classList.add('active');
+}
+
+function closeDetail(e){
+if(e&&e.target.id!=='detailOverlay'&&e.tagName!=='BUTTON')return;
+document.getElementById('detailOverlay').classList.remove('active');
+}
+
+function renderSirr(c){
+c.innerHTML='<div class="empty">🛡️ سر في بئر<br><br>قريباً إن شاء الله<br><br><small>ملاحظاتك المشفرة بينك وبين الله</small></div>';
+}
+
+function renderSettings(c){
+var t=getTheme();
+var labels={morning:'الفجر ☀️',evening:'المغرب 🌆',sleep:'الليل 🌙'};
+var descs={morning:'نور وإشراق بالأزرق والأخضر النيون',evening:'دفء وسكينة بالبنفسجي والبرتقالي',sleep:'هدوء وأمان بالأحمر والذهبي'};
+c.innerHTML='<div class="card"><h3>الثيم الحالي</h3><p style="font-size:20px;color:var(--neon1);text-align:center;margin:10px 0">'+labels[t]+'</p><p style="text-align:center">'+descs[t]+'</p></div>'+
+'<div class="card"><h3>عن التطبيق</h3><p>Zekr Alrahman — تطبيق أذكار مخصصة مع أسماء الله الحسنى</p><p style="margin-top:8px;color:var(--neon2);font-size:11px">صُنع بحب لله. اللهم اجعله في ميزان حسناتنا 🤲</p></div>'+
+'<div class="card"><h3>الإصدار</h3><p>1.0.0 — يوليو ٢٠٢٦</p></div>';
+}
+
+// Init
+applyTheme();
+render();
+setInterval(applyTheme,60000);
+</script>
 </body>
 </html>
