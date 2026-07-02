@@ -2,7 +2,7 @@
 //  NameDetailScreen - تفاصيل اسم الله
 // ============================================================================
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   View,
   StyleSheet,
@@ -10,13 +10,6 @@ import {
   TouchableOpacity,
   Share,
 } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withRepeat,
-  withTiming,
-  interpolate,
-} from 'react-native-reanimated';
 
 import NeonText from '../components/NeonText';
 import GlassCard from '../components/GlassCard';
@@ -29,24 +22,7 @@ export default function NameDetailScreen({ route, navigation }) {
   const theme = getCurrentTheme();
   const nameObj = NAMES_OF_ALLAH.find((n) => n.id === nameId) || NAMES_OF_ALLAH[0];
 
-  // Pulse animation
-  const pulse = useSharedValue(0);
-  useEffect(() => {
-    pulse.value = withRepeat(
-      withTiming(1, { duration: 2500 }),
-      -1,
-      true
-    );
-  }, []);
-
-  const glowStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(pulse.value, [0, 1], [0.6, 1]),
-    transform: [
-      {
-        scale: interpolate(pulse.value, [0, 1], [1, 1.05]),
-      },
-    ],
-  }));
+  // Simple static display (no animation for stability)
 
   const handleShare = async () => {
     try {
@@ -62,7 +38,7 @@ export default function NameDetailScreen({ route, navigation }) {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Big Name */}
-        <Animated.View style={[styles.bigNameContainer, glowStyle]}>
+        <View style={styles.bigNameContainer}>
           <NeonText
             color={nameObj.glowColor}
             size={52}
@@ -72,7 +48,7 @@ export default function NameDetailScreen({ route, navigation }) {
           >
             {nameObj.name}
           </NeonText>
-        </Animated.View>
+        </View>
 
         <NeonText color="secondary" size={16} style={styles.meaning}>
           {nameObj.meaning}

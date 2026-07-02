@@ -1,16 +1,17 @@
 // ============================================================================
-//  App.js - نقطة الدخول الرئيسية
-//  Navigation setup مع Dynamic Theme Provider + Default Data Loading
+//  App.js - نسخة مبسّطة ومضمونة
+//  Navigation setup مع SimpleBackground + SimpleIcon
+//  بدون Reanimated وبدون Vector Icons
 // ============================================================================
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import { Ionicons } from '@expo/vector-icons';
 
-import DynamicBackground from './src/components/DynamicBackground';
+import SimpleBackground from './src/components/SimpleBackground';
+import SimpleIcon from './src/components/SimpleIcon';
 import { getCurrentTheme } from './src/theme/themeEngine';
 import { useAppStore } from './src/store/appStore';
 
@@ -72,7 +73,7 @@ function TabNavigator() {
     const interval = setInterval(() => {
       const newTheme = getCurrentTheme();
       setTheme(newTheme.key);
-    }, 60000); // check every minute
+    }, 60000);
 
     return () => clearInterval(interval);
   }, []);
@@ -99,7 +100,7 @@ function TabNavigator() {
           fontSize: 11,
           marginTop: 2,
         },
-        tabBarIcon: ({ focused, color, size }) => {
+        tabBarIcon: ({ focused, color }) => {
           let iconName;
           switch (route.name) {
             case 'Adhkar':
@@ -115,7 +116,7 @@ function TabNavigator() {
               iconName = focused ? 'cog' : 'cog-outline';
               break;
           }
-          return <Ionicons name={iconName} size={22} color={color} />;
+          return <SimpleIcon name={iconName} size={20} color={color} />;
         },
       })}
     >
@@ -148,9 +149,9 @@ export default function App() {
     <>
       <StatusBar style="light" translucent />
       <NavigationContainer>
-        <DynamicBackground>
+        <SimpleBackground>
           <TabNavigator />
-        </DynamicBackground>
+        </SimpleBackground>
       </NavigationContainer>
     </>
   );
