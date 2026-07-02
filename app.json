@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "Zekr Alrahman",
+    "slug": "zekr-alrahman",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#050505"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.zekralrahman.app",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "يستخدم التطبيق Face ID لحماية ملاحظاتك في سر في بئر",
+        "UIUserInterfaceStyle": "Dark"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#050505"
+      },
+      "package": "com.zekralrahman.app",
+      "permissions": [
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-local-authentication"
+    ],
+    "fonts": {
+      "Cairo-Bold": "./assets/fonts/Cairo-Bold.ttf",
+      "Cairo-Regular": "./assets/fonts/Cairo-Regular.ttf",
+      "Amiri-Regular": "./assets/fonts/Amiri-Regular.ttf",
+      "Amiri-Bold": "./assets/fonts/Amiri-Bold.ttf",
+      "ArefRuqaa": "./assets/fonts/ArefRuqaa-Regular.ttf",
+      "ReemKufi": "./assets/fonts/ReemKufi-Regular.ttf",
+      "Almarai-Regular": "./assets/fonts/Almarai-Regular.ttf",
+      "Tajawal-Regular": "./assets/fonts/Tajawal-Regular.ttf"
+    }
+  }
+}

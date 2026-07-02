@@ -1,0 +1,53 @@
+{
+  "name": "zekr-alrahman",
+  "version": "1.0.0",
+  "description": "Zekr Alrahman - تطبيق أذكار مخصصة مع أسماء الله الحسنى والمفكرة المشفرة",
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~6.1.2",
+    "@fontsource/almarai": "^5.2.8",
+    "@fontsource/amiri": "^5.2.8",
+    "@fontsource/aref-ruqaa": "^5.2.8",
+    "@fontsource/cairo": "^5.2.7",
+    "@fontsource/reem-kufi": "^5.2.11",
+    "@fontsource/tajawal": "^5.2.7",
+    "@react-navigation/bottom-tabs": "^7.0.0",
+    "@react-navigation/native": "^7.0.0",
+    "@react-navigation/stack": "^7.0.0",
+    "crypto-js": "^4.2.0",
+    "expo": "~54.0.0",
+    "expo-crypto": "~15.0.9",
+    "expo-font": "~14.0.0",
+    "expo-haptics": "~15.0.8",
+    "expo-local-authentication": "~17.0.8",
+    "expo-notifications": "~0.32.17",
+    "expo-secure-store": "~15.0.8",
+    "expo-sqlite": "~16.0.0",
+    "expo-status-bar": "~3.0.9",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-gesture-handler": "~2.28.0",
+    "react-native-reanimated": "~4.1.1",
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-screens": "~4.16.0",
+    "react-native-vector-icons": "^10.0.0",
+    "react-native-web": "^0.21.0",
+    "react-native-worklets": "^0.5.2",
+    "uuid": "^9.0.0",
+    "zustand": "^4.5.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.0",
+    "@types/react": "~19.1.10",
+    "typescript": "~5.9.2"
+  },
+  "private": true
+}
