@@ -341,7 +341,11 @@ function setFilter(cat){filterCat=cat;render();}
 function increment(id,i){
 counts[id]=(counts[id]||0)+1;
 if(counts[id]>ADHKAR[i].target)counts[id]=ADHKAR[i].target;
+recordDhikr();
 renderAdhkar(document.getElementById('content'));
+if(counts[id]===ADHKAR[i].target){
+try{navigator.vibrate&&navigator.vibrate(50)}catch(e){}
+}
 }
 
 function renderNames(c){
@@ -485,15 +489,174 @@ function renderSettings(c){
 var t=getTheme();
 var labels={morning:'الفجر ☀️',evening:'المغرب 🌆',sleep:'الليل 🌙'};
 var descs={morning:'نور وإشراق بالأزرق والأخضر النيون',evening:'دفء وسكينة بالبنفسجي والبرتقالي',sleep:'هدوء وأمان بالأحمر والذهبي'};
-c.innerHTML='<div class="card"><h3>الثيم الحالي</h3><p style="font-size:20px;color:var(--neon1);text-align:center;margin:10px 0">'+labels[t]+'</p><p style="text-align:center">'+descs[t]+'</p></div>'+
-'<div class="card"><h3>عن التطبيق</h3><p>Zekr Alrahman — تطبيق أذكار مخصصة مع أسماء الله الحسنى</p><p style="margin-top:8px;color:var(--neon2);font-size:11px">صُنع بحب لله. اللهم اجعله في ميزان حسناتنا 🤲</p></div>'+
-'<div class="card"><h3>الإصدار</h3><p>1.0.0 — يوليو ٢٠٢٦</p></div>';
+
+// Statistics
+var stats=getStats();
+var totalDone=stats.totalDone||0;
+var todayDone=stats.todayDone||0;
+var streak=stats.streak||0;
+var lastActive=stats.lastActive||'';
+
+var statsHtml='<div class="card"><h3>📊 إحصائيات الأذكار</h3>'+
+'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">'+
+'<div style="text-align:center;padding:12px;background:rgba(0,212,255,0.05);border-radius:12px"><div style="font-size:24px;color:var(--neon1);font-weight:700">'+totalDone+'</div><div style="font-size:10px;color:rgba(255,255,255,0.4)">إجمالي التسبيحات</div></div>'+
+'<div style="text-align:center;padding:12px;background:rgba(0,255,136,0.05);border-radius:12px"><div style="font-size:24px;color:var(--neon2);font-weight:700">'+todayDone+'</div><div style="font-size:10px;color:rgba(255,255,255,0.4)">اليوم</div></div>'+
+'<div style="text-align:center;padding:12px;background:rgba(178,75,243,0.05);border-radius:12px"><div style="font-size:24px;color:#B24BF3;font-weight:700">'+streak+'</div><div style="font-size:10px;color:rgba(255,255,255,0.4)">أيام متتالية</div></div>'+
+'<div style="text-align:center;padding:12px;background:rgba(255,215,0,0.05);border-radius:12px"><div style="font-size:14px;color:#FFD700;font-weight:700">'+(lastActive||'—')+'</div><div style="font-size:10px;color:rgba(255,255,255,0.4)">آخر نشاط</div></div>'+
+'</div></div>';
+
+// Reminders
+var reminders=getReminders();
+var remHtml='<div class="card"><h3>⏰ التذكيرات</h3>'+
+'<p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:10px">فعّل الإشعارات لتذكيرك بالأذكار</p>';
+var times=[{k:'morning',l:'أذكار الصباح',h:5,m:0},{k:'evening',l:'أذكار المساء',h:17,m:0},{k:'sleep',l:'أذكار النوم',h:21,m:0}];
+times.forEach(function(tm){
+var on=reminders[tm.k]||false;
+remHtml+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">'+
+'<span style="font-size:13px">'+tm.l+' <small style="color:rgba(255,255,255,0.3)">('+tm.h+':'+(tm.m<10?'0':'')+tm.m+')</small></span>'+
+'<button onclick="toggleReminder(\''+tm.k+'\')" style="padding:4px 12px;border-radius:20px;border:1px solid '+(on?'var(--neon2)':'var(--border)')+';background:'+(on?'rgba(0,255,136,0.1)':'transparent')+';color:'+(on?'var(--neon2)':'rgba(255,255,255,0.3)')+';font-size:11px;cursor:pointer;font-family:Cairo">'+(on?'✓ مفعّل':'تفعيل')+'</button></div>';
+});
+remHtml+='</div>';
+
+// Export/Import
+var dataHtml='<div class="card"><h3>💾 التصدير والاستيراد</h3>'+
+'<p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:10px">احفظ بياناتك أو استوردها على جهاز آخر</p>'+
+'<div style="display:flex;gap:8px">'+
+'<button onclick="exportData()" style="flex:1;padding:12px;background:rgba(0,212,255,0.1);border:1px solid var(--neon1);border-radius:12px;color:var(--neon1);cursor:pointer;font-family:Cairo;font-size:13px">📤 تصدير</button>'+
+'<button onclick="document.getElementById(\'importFile\').click()" style="flex:1;padding:12px;background:rgba(0,255,136,0.1);border:1px solid var(--neon2);border-radius:12px;color:var(--neon2);cursor:pointer;font-family:Cairo;font-size:13px">📥 استيراد</button></div>'+
+'<input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)"></div>';
+
+// Theme
+var themeHtml='<div class="card"><h3>🎨 الثيم الحالي</h3>'+
+'<p style="font-size:20px;color:var(--neon1);text-align:center;margin:10px 0">'+labels[t]+'</p>'+
+'<p style="text-align:center">'+descs[t]+'</p></div>';
+
+// About
+var aboutHtml='<div class="card"><h3>ℹ️ عن التطبيق</h3>'+
+'<p>Zekr Alrahman — تطبيق أذكار مخصصة مع أسماء الله الحسنى وسر في بئر</p>'+
+'<p style="margin-top:8px;color:var(--neon2);font-size:11px">صُنع بحب لله. اللهم اجعله في ميزان حسناتنا 🤲</p></div>';
+
+var verHtml='<div class="card"><h3>الإصدار</h3><p>1.1.0 — يوليو ٢٠٢٦</p>'+
+'<p style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px">٤٤ ذكر • ٩٩ اسم • سر في بئر • إحصائيات • تذكيرات</p></div>';
+
+c.innerHTML=statsHtml+remHtml+dataHtml+themeHtml+aboutHtml+verHtml;
+}
+
+// ============================================================================
+//  Statistics
+// ============================================================================
+function getStats(){try{return JSON.parse(localStorage.getItem('zekr_stats')||'{}')}catch(e){return{}}}
+function saveStats(s){localStorage.setItem('zekr_stats',JSON.stringify(s))}
+
+function recordDhikr(){
+var s=getStats();
+var today=new Date().toLocaleDateString('en-CA');
+s.totalDone=(s.totalDone||0)+1;
+if(s.lastDay===today){
+s.todayDone=(s.todayDone||0)+1;
+}else{
+var yesterday=new Date(Date.now()-86400000).toLocaleDateString('en-CA');
+if(s.lastDay===yesterday){s.streak=(s.streak||0)+1}else{s.streak=1}
+s.todayDone=1;
+s.lastDay=today;
+}
+s.lastActive=new Date().toLocaleDateString('ar-EG');
+saveStats(s);
+}
+
+// ============================================================================
+//  Reminders
+// ============================================================================
+function getReminders(){try{return JSON.parse(localStorage.getItem('zekr_reminders')||'{}')}catch(e){return{}}}
+function saveReminders(r){localStorage.setItem('zekr_reminders',JSON.stringify(r))}
+
+function toggleReminder(key){
+var r=getReminders();
+r[key]=!r[key];
+saveReminders(r);
+if(r[key]){
+if('Notification' in window){Notification.requestPermission().then(function(p){
+if(p==='granted'){showNotification('✨ تم تفعيل التذكير','سيتم تذكيرك بأذكار '+({morning:'الصباح',evening:'المساء',sleep:'النوم'}[key])+' في موعدها إن شاء الله')}
+})}
+setupReminderAlarm(key);
+}else{
+clearReminderAlarm(key);
+}
+renderSettings(document.getElementById('content'));
+}
+
+var reminderAlarms={};
+function setupReminderAlarm(key){
+var times={morning:5,evening:17,sleep:21};
+var h=times[key];
+var now=new Date();
+var next=new Date();
+next.setHours(h,0,0,0);
+if(next<=now)next.setDate(next.getDate()+1);
+var ms=next-now;
+clearReminderAlarm(key);
+reminderAlarms[key]=setTimeout(function(){
+if(getReminders()[key]){
+showNotification('✨ ذكر الرحمن','حان وقت أذكار '+({morning:'الصباح',evening:'المساء',sleep:'النوم'}[key])+' — اذكر الله');
+setupReminderAlarm(key);
+}
+},ms);
+}
+
+function clearReminderAlarm(key){if(reminderAlarms[key]){clearTimeout(reminderAlarms[key]);delete reminderAlarms[key]}}
+
+function showNotification(title,body){
+if('Notification' in window && Notification.permission==='granted'){
+new Notification(title,{body:body,icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🌙</text></svg>'});
+}
+}
+
+// ============================================================================
+//  Export / Import
+// ============================================================================
+function exportData(){
+var data={
+version:'1.1.0',
+exportDate:new Date().toISOString(),
+stats:getStats(),
+reminders:getReminders(),
+notes:getNotes(),
+counts:counts,
+};
+var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+var a=document.createElement('a');
+a.href=URL.createObjectURL(blob);
+a.download='zekr-alrahman-backup-'+new Date().toLocaleDateString('en-CA')+'.json';
+a.click();
+}
+
+function importData(e){
+var file=e.target.files[0];
+if(!file)return;
+var reader=new FileReader();
+reader.onload=function(ev){
+try{
+var data=JSON.parse(ev.target.result);
+if(data.stats)saveStats(data.stats);
+if(data.reminders)saveReminders(data.reminders);
+if(data.notes)saveNotes(data.notes);
+if(data.counts)counts=data.counts;
+alert('✅ تم الاستيراد بنجاح');
+render();
+}catch(err){
+alert('❌ ملف غير صالح: '+err.message);
+}
+};
+reader.readAsText(file);
 }
 
 // Init
 applyTheme();
 render();
 setInterval(applyTheme,60000);
+// Restore active reminders
+var savedReminders=getReminders();
+Object.keys(savedReminders).forEach(function(k){if(savedReminders[k])setupReminderAlarm(k)});
 </script>
 </body>
 </html>
